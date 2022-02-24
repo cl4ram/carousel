@@ -1,16 +1,17 @@
 <script>
 export default {
 	name: 'DotsIndicators',
-	props: {
-		photoid: String
+	props: ['index'],
+	methods: {
+		goto(index) {
+			this.$emit(index);
+		}
 	}
 };
 </script>
 
 <template>
-
-        <div :class="photoid" ></div>
-
+    <div @click="$emit('goto', index)"></div>
 </template>
 
 <style scoped>

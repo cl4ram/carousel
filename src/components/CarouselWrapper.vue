@@ -17,103 +17,67 @@ export default {
 				'https://picsum.photos/id/243/400/400',
 				'https://picsum.photos/id/244/400/400',
 				'https://picsum.photos/id/235/400/400',
-				'https://picsum.photos/id/236/400/400',
-				'https://picsum.photos/id/237/400/400',
-				'https://picsum.photos/id/238/400/400',
-				'https://picsum.photos/id/239/400/400',
-				'https://picsum.photos/id/240/400/400',
-				'https://picsum.photos/id/241/400/400',
-				'https://picsum.photos/id/242/400/400',
-				'https://picsum.photos/id/243/400/400',
-				'https://picsum.photos/id/244/400/400',
-				'https://picsum.photos/id/235/400/400',
 				'https://picsum.photos/id/236/400/400'],
 			innerStyles: {},
-			step: '',
 			currentSlide: 0,
-			newStep: '',
-			setIndex: ''
+			step: '',
+			afterMoveStep: 0
 
 		};
 	},
 	computed: {
-		carouselLen() {
-			let carLen = this.data.length - 1;
+		carouselLength() {
+			let carouselLength = this.data.length;
 
-			return carLen;
+			return carouselLength;
 		}
 	},
 	methods: {
 
 		setStep() {
-			const innerWidth = this.$refs.inner.scrollWidth;
-			const totalCards = this.carouselLen + 1;
-			this.step = (innerWidth / totalCards);
-			console.log(this.carouselLen);
+			this.step = (this.$refs.inner.scrollWidth / (this.carouselLength));
 		},
 
-		currentSlidePlus() {
-			let slideChecked = this.currentSlide++;
-			console.log(slideChecked);
-		},
-
-		currentSlideNext() {
-			this.newStep = ((this.newStep) + (this.step) * -1);
-		},
-
-		moveNext() {
-			if (this.currentSlide < (this.carouselLen - 2)) {
-				this.currentSlidePlus();
-				this.currentSlideNext();
+		move(moveStep) {
+			this.currentSlide = this.currentSlide + moveStep;
+			if (moveStep >= 0) {
+				console.log(this.currentSlide);
+				this.afterMoveStep = ((this.afterMoveStep) + (this.step) * -1);
+				console.log(this.afterMoveStep);
 				this.innerStyles = {
-					transform: `translateX(${this.newStep}px)`
+					transform: `translateX(${this.afterMoveStep}px)`
 				};
-			} else if (this.currentSlide == (this.carouselLen - 2)) {
+			} else if ((this.currentSlide == this.carouselLength - 2) || (this.currentSlide < 1)) {
 				this.currentSlide = 0;
-				this.newStep = 0;
+				this.afterMoveStep = 0;
+				this.innerStyles = {
+					transform: 'translateX(0px)' };
+			} else {
+				this.afterMoveStep = ((this.afterMoveStep) - (this.step) * -1);
+				this.innerStyles = {
+					transform: `translateX(${this.afterMoveStep}px)`
+				};
+			}
+
+			if ((this.currentSlide == this.carouselLength - 2) || (this.currentSlide < 1)) {
+				this.currentSlide = 0;
+				this.afterMoveStep = 0;
 				this.innerStyles = {
 					transform: 'translateX(0px)' };
 			}
 		},
 
-		currentSlideLessOne() {
-			let slideChecked = this.currentSlide--;
-			console.log(slideChecked);
-		},
-
-
-		currentSlidePrev() {
-			this.newStep = ((this.newStep) - (this.step) * -1);
-		},
-
-		movePrev() {
-			if (this.currentSlide > 1) {
-				this.currentSlideLessOne();
-				this.currentSlidePrev();
-				this.innerStyles = {
-					transform: `translateX(${this.newStep}px)`
-				};
-				console.log(this.innerStyles);
-			} else if (this.currentSlide === 1) {
-				this.currentSlide = 0;
-				this.newStep = 0;
-				this.innerStyles = {
-					transform: 'translateX(0px)' };
-			}
-		},
 
 		goto(index) {
-			this.newStep = this.step * index * -1;
+			this.afterMoveStep = this.step * index * -1;
 			this.currentSlide = index;
 			this.innerStyles = {
-				transform: `translateX(${this.newStep}px)`
+				transform: `translateX(${this.afterMoveStep}px)`
 			};
 		}
 	},
 	mounted() {
 		this.setStep();
-		this.currentSlideNext();
-		this.currentSlidePrev();
 	}
 };
 </script>
@@ -125,20 +89,20 @@ export default {
             <div class="wrapper" >
                 <div class="inner" ref="inner" :style="innerStyles">
                         <div v-for='photo in data' :key="photo" class="card" >
-                            <images-for-carousel :photoLink="photo" :slideNumber="photo.id"  >
+                            <images-for-carousel :photoLink="photo">
                             </images-for-carousel>
                         </div>
                 </div>
             </div>
             <div class="arrows">
-                <arrows-for-carrusel class="left" @click="movePrev" :class="(this.currentSlide <= 0) ? 'disabled' : 'active'"/>
-                <arrows-for-carrusel class="right" @click="moveNext"/>
+                <arrows-for-carrusel class="left" @click="move(-1)" :class="(this.currentSlide <= 0) ? 'disabled' : 'active'"/>
+                <arrows-for-carrusel class="right" @click="move(1)"/>
             </div>
         </div>
 
         <div class="indicators">
-            <div v-for='(id, index) in data' :key="id" :index="index"  :class="(this.currentSlide == index) ? 'active' : 'normal'" @click="goto(index)" class="dots">
-                <dots-indicators :photoid="'photo' + id.id"/>
+            <div v-for='(id, index) in data' :key="id" :class="(this.currentSlide == index) ? 'active' : 'normal'" class="dots">
+                <dots-indicators :photoid="'photo' + id.id" @goto="goto" :index="index"  />
             </div>
         </div>
 
@@ -159,6 +123,7 @@ h1 {
     overflow: hidden;
     display: flex;
     justify-content: center;
+	position: relative;
 }
 
 .wrapper{
@@ -178,7 +143,7 @@ h1 {
 
 .arrows {
     position: absolute;
-    top: 300px;
+    top: 200px;
     display: flex;
     width: 100%;
 }

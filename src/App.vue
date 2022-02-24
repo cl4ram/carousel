@@ -11,6 +11,7 @@
 <script setup>
 import CarouselWrapper from './components/CarouselWrapper.vue';
 
+
 </script>
 
 <style>

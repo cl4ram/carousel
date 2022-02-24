@@ -1,9 +1,6 @@
 <script>
 export default {
-	name: 'ImagesForCarousel',
-	props: {
-		photoLink: String
-	}
+	name: 'ImagesForCarousel'
 };
 </script>
 

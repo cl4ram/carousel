@@ -1,12 +1,12 @@
 <script>
 export default {
 	name: 'ImagesForCarousel',
-	props:
-	{
+	props: {
 		photoLink: {
 			type: String,
-			required: true },
-		slideNumber: Number	}
+			required: true
+		}
+	}
 
 };
 </script>
@@ -14,22 +14,14 @@ export default {
 <template>
     <div class="slide">
         <img :src="photoLink" />
-        <p>{{ slideNumber }}</p>
     </div>
 </template>
 
 <style scoped>
 
-
-p {
-    position: absolute;
-	top: 40%;
-    left: 0;
-	right: 0;
-	display: flex;
-	justify-content: center;
-    color: aliceblue;
-    font: 900 56px Helvetica;
+img{
+	width: 300px;
+	height: 300px;
 }
 
 </style>
