@@ -58,13 +58,6 @@ export default {
 					transform: `translateX(${this.afterMoveStep}px)`
 				};
 			}
-
-			if ((this.currentSlide == this.carouselLength - 2) || (this.currentSlide < 1)) {
-				this.currentSlide = 0;
-				this.afterMoveStep = 0;
-				this.innerStyles = {
-					transform: 'translateX(0px)' };
-			}
 		},
 
 
