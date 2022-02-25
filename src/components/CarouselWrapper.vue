@@ -20,47 +20,31 @@ export default {
 				'https://picsum.photos/id/236/400/400'],
 			innerStyles: {},
 			currentSlide: 0,
-			step: '',
-			afterMoveStep: 0
+			afterMoveStep: 0,
+			step: null
 
 		};
 	},
-	computed: {
-		carouselLength() {
-			let carouselLength = this.data.length;
-
-			return carouselLength;
-		}
-	},
 	methods: {
-
 		setStep() {
-			this.step = (this.$refs.inner.scrollWidth / (this.carouselLength));
+			this.step = (this.$refs.inner.scrollWidth / (this.data.length));
 		},
 
-		move(moveStep) {
-			this.currentSlide = this.currentSlide + moveStep;
-			if (moveStep >= 0) {
-				this.afterMoveStep = ((this.afterMoveStep) + (this.step) * -1);
-				this.innerStyles = {
-					transform: `translateX(${this.afterMoveStep}px)`
-				};
-			} else {
-				this.afterMoveStep = ((this.afterMoveStep) - (this.step) * -1);
-				this.innerStyles = {
-					transform: `translateX(${this.afterMoveStep}px)`
-				};
-			}
+		setMove(direction) {
+			this.currentSlide = this.currentSlide + direction;
+			this.afterMoveStep = this.afterMoveStep + this.step * direction * -1;
+			this.innerStyles = {
+				transform: `translateX(${this.afterMoveStep}px)`
+			};
 
-			if ((this.currentSlide == (this.carouselLength - 2)) || (this.currentSlide < 1)) {
+
+			if ((this.currentSlide == (this.data.length - 2)) || (this.currentSlide < 1)) {
 				this.currentSlide = 0;
 				this.afterMoveStep = 0;
 				this.innerStyles = {
 					transform: 'translateX(0px)' };
 			}
 		},
-
-
 		goto(index) {
 			this.afterMoveStep = this.step * index * -1;
 			this.currentSlide = index;
@@ -88,14 +72,14 @@ export default {
                 </div>
             </div>
             <div class="arrows">
-                <arrows-for-carrusel class="left" @click="move(-1)" :class="(this.currentSlide <= 0) ? 'disabled' : 'active'"/>
-                <arrows-for-carrusel class="right" @click="move(1)"/>
+                <arrows-for-carrusel class="left" @click="setMove(-1)" :class="(this.currentSlide <= 0) ? 'disabled' : 'active'"/>
+                <arrows-for-carrusel class="right" @click="setMove(1)"/>
             </div>
         </div>
 
         <div class="indicators">
             <div v-for='(id, index) in data' :key="id" :class="(this.currentSlide == index) ? 'active' : 'normal'" class="dots">
-                <dots-indicators :photoid="'photo' + id.id" @goto="goto" :index="index"  />
+                <dots-indicators :photoid="'photo' + id.id" @goto="setMove(index)" :index="index"  />
             </div>
         </div>
 
@@ -105,33 +89,34 @@ export default {
 <style>
 
 h1 {
-    color: white;
     background-color: rgb(85, 85, 85);
+    color: white;
     text-align: center;
-    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
-.slider-wrapper{
-    width: 100%;
-    overflow: hidden;
+.slider-wrapper {
+    position: relative;
     display: flex;
-    justify-content: center;
-	position: relative;
-}
-
-.wrapper{
-    width: calc(400px * 3);
     overflow: hidden;
+    justify-content: center;
+    width: 100%;
 }
 
-.inner{
-  transition: transform .5s;
-  white-space: nowrap;
+.wrapper {
+    overflow: hidden;
+    width: calc(400px * 3);
 }
+
+.inner {
+    white-space: nowrap;
+    transition: transform 0.5s;
+}
+
 .card {
-  margin-right: 10px;
-  display: inline-flex;
-  width: 400px;
+    display: inline-flex;
+    width: 400px;
+    margin-right: 10px;
 }
 
 .arrows {
@@ -141,15 +126,14 @@ h1 {
     width: 100%;
 }
 
-.disabled .arrow{
+.disabled .arrow {
     opacity: 10%;
     cursor: auto;
 }
 
-.disabled .arrow:hover{
+.disabled .arrow:hover {
     opacity: 10%;
 }
-
 
 .left {
     position: absolute;
@@ -169,19 +153,21 @@ h1 {
     transform: rotate(-45deg);
 }
 
-.indicators .active div{
-	background-color: #ff0000;
+.indicators .active div {
+    background-color: #ff0000;
 }
 
-.indicators{
+.indicators {
     display: flex;
     justify-content: center;
     margin-top: 20px;
 }
 
 .dots:last-child,
-.dots:nth-last-child(2){
-	display: none;
+.dots:nth-last-child(2) {
+    display: none;
 }
+
+
 
 </style>
