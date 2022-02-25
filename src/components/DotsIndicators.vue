@@ -3,15 +3,15 @@ export default {
 	name: 'DotsIndicators',
 	props: ['index'],
 	methods: {
-		goto(index) {
-			this.$emit(index);
+		goto() {
+			this.$emit();
 		}
 	}
 };
 </script>
 
 <template>
-    <div @click="$emit('goto', index)"></div>
+    <div @click="$emit('dotClick')"></div>
 </template>
 
 <style scoped>

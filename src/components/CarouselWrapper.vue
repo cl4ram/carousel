@@ -1,3 +1,30 @@
+<template>
+    <div>
+
+        <div class="slider-wrapper">
+            <div class="wrapper" >
+                <div class="inner" ref="inner" :style="innerStyles">
+                        <div v-for='photo in data' :key="photo" class="card" >
+                            <images-for-carousel :photoLink="photo">
+                            </images-for-carousel>
+                        </div>
+                </div>
+            </div>
+            <div class="arrows">
+                <arrows-for-carrusel class="left" @click="changePosition(-1)" :class="(this.currentSlide <= 0) ? 'disabled' : 'active'"/>
+                <arrows-for-carrusel class="right" @click="changePosition(1)"/>
+            </div>
+        </div>
+
+        <div class="indicators">
+            <div v-for='(id, index) in data' :key="id" :class="(this.currentSlide == index) ? 'active' : 'normal'" class="dots">
+                <dots-indicators :data-number="index" @dotClick="changePosition" :index="index"  />
+            </div>
+        </div>
+
+    </div>
+</template>
+
 <script>
 import ImagesForCarousel from './ImagesForCarousel.vue';
 import DotsIndicators from './DotsIndicators.vue';
@@ -19,9 +46,9 @@ export default {
 				'https://picsum.photos/id/235/400/400',
 				'https://picsum.photos/id/236/400/400'],
 			innerStyles: {},
-			currentSlide: 0,
-			afterMoveStep: 0,
-			step: null
+			step: null,
+			currentSlide: 0
+
 
 		};
 	},
@@ -30,27 +57,34 @@ export default {
 			this.step = (this.$refs.inner.scrollWidth / (this.data.length));
 		},
 
-		setMove(direction) {
-			this.currentSlide = this.currentSlide + direction;
-			this.afterMoveStep = this.afterMoveStep + this.step * direction * -1;
-			this.innerStyles = {
-				transform: `translateX(${this.afterMoveStep}px)`
-			};
-
-
-			if ((this.currentSlide == (this.data.length - 2)) || (this.currentSlide < 1)) {
-				this.currentSlide = 0;
-				this.afterMoveStep = 0;
-				this.innerStyles = {
-					transform: 'translateX(0px)' };
+		changePosition(variable) {
+			if (Number.isInteger(variable)) {
+				this.setMove(variable);
+			} else {
+				this.goto();
 			}
 		},
-		goto(index) {
-			this.afterMoveStep = this.step * index * -1;
-			this.currentSlide = index;
+		setMove(direction) {
+			this.currentSlide += direction;
 			this.innerStyles = {
-				transform: `translateX(${this.afterMoveStep}px)`
+				transform: `translateX(-${this.currentSlide * this.step}px)`
 			};
+		},
+		goto() {
+			this.currentSlide = Number(event.target.dataset.number);
+			this.innerStyles = {
+				transform: `translateX(-${this.currentSlide * this.step}px)`
+			};
+		}
+	},
+	watch: {
+		currentSlide() {
+			if ((this.currentSlide == this.data.length - 2) || this.currentSlide < 1) {
+				this.currentSlide = 0;
+				this.innerStyles = {
+					transform: 'translateX(0px)'
+				};
+			}
 		}
 	},
 	mounted() {
@@ -58,33 +92,6 @@ export default {
 	}
 };
 </script>
-
-<template>
-    <div>
-
-        <div class="slider-wrapper">
-            <div class="wrapper" >
-                <div class="inner" ref="inner" :style="innerStyles">
-                        <div v-for='photo in data' :key="photo" class="card" >
-                            <images-for-carousel :photoLink="photo">
-                            </images-for-carousel>
-                        </div>
-                </div>
-            </div>
-            <div class="arrows">
-                <arrows-for-carrusel class="left" @click="setMove(-1)" :class="(this.currentSlide <= 0) ? 'disabled' : 'active'"/>
-                <arrows-for-carrusel class="right" @click="setMove(1)"/>
-            </div>
-        </div>
-
-        <div class="indicators">
-            <div v-for='(id, index) in data' :key="id" :class="(this.currentSlide == index) ? 'active' : 'normal'" class="dots">
-                <dots-indicators :photoid="'photo' + id.id" @goto="setMove(index)" :index="index"  />
-            </div>
-        </div>
-
-    </div>
-</template>
 
 <style>
 
@@ -167,7 +174,6 @@ h1 {
 .dots:nth-last-child(2) {
     display: none;
 }
-
 
 
 </style>
