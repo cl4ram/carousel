@@ -41,22 +41,22 @@ export default {
 		move(moveStep) {
 			this.currentSlide = this.currentSlide + moveStep;
 			if (moveStep >= 0) {
-				console.log(this.currentSlide);
 				this.afterMoveStep = ((this.afterMoveStep) + (this.step) * -1);
-				console.log(this.afterMoveStep);
 				this.innerStyles = {
 					transform: `translateX(${this.afterMoveStep}px)`
 				};
-			} else if ((this.currentSlide == this.carouselLength - 2) || (this.currentSlide < 1)) {
-				this.currentSlide = 0;
-				this.afterMoveStep = 0;
-				this.innerStyles = {
-					transform: 'translateX(0px)' };
 			} else {
 				this.afterMoveStep = ((this.afterMoveStep) - (this.step) * -1);
 				this.innerStyles = {
 					transform: `translateX(${this.afterMoveStep}px)`
 				};
+			}
+
+			if ((this.currentSlide == (this.carouselLength - 2)) || (this.currentSlide < 1)) {
+				this.currentSlide = 0;
+				this.afterMoveStep = 0;
+				this.innerStyles = {
+					transform: 'translateX(0px)' };
 			}
 		},
 
